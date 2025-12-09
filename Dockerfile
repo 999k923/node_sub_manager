@@ -17,10 +17,10 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY . .
 
 # 给 reset_id_only_safe.py 添加执行权限
-RUN chmod +x reset_id_only_safe.py
+RUN chmod +x reset_node_id.py
 
 # 创建 Cron 计划：每小时执行一次 reset_id_only_safe.py
-RUN echo "0 * * * * python3 /app/reset_id_only_safe.py >> /app/cron.log 2>&1" > /etc/cron.d/reset-cron
+RUN echo "0 * * * * python3 /app/reset_node_id.py >> /app/cron.log 2>&1" > /etc/cron.d/reset-cron
 
 # 给 Cron 文件加权限并注册
 RUN chmod 0644 /etc/cron.d/reset-cron \
