@@ -1,54 +1,94 @@
 #!/bin/bash
-echo "更新系统..."
-sudo apt update && sudo apt upgrade -y
+# deploy_venv.sh - 自动虚拟环境部署 Node Subscription Manager
 
-echo "安装 Python3 & pip..."
-sudo apt install python3 python3-pip -y
+APP_DIR="/root/node_name"
+VENV_DIR="$APP_DIR/venv"
+SERVICE_FILE="/etc/systemd/system/node_sub.service"
 
-echo "安装依赖..."
-pip3 install -r requirements.txt
-
-echo "初始化数据库..."
-python3 db_init.py
+echo "=== 更新系统 & 安装 Python3 ==="
+apt update -y
+apt upgrade -y
+apt install -y python3 python3-venv python3-pip
 
 # ---------------------------
-# 生成 token 文件（如果不存在）
+# 创建虚拟环境
+# ---------------------------
+if [ ! -d "$VENV_DIR" ]; then
+    echo "创建虚拟环境..."
+    python3 -m venv "$VENV_DIR"
+else
+    echo "虚拟环境已存在，跳过创建"
+fi
+
+# 激活虚拟环境
+source "$VENV_DIR/bin/activate"
+
+# ---------------------------
+# 安装依赖
+# ---------------------------
+echo "安装 Python 依赖..."
+pip install --upgrade pip
+pip install -r "$APP_DIR/requirements.txt"
+pip install requests gunicorn --upgrade
+
+# ---------------------------
+# 初始化数据库
+# ---------------------------
+echo "初始化数据库..."
+python "$APP_DIR/db_init.py"
+
+# ---------------------------
+# 生成 token 文件
 # ---------------------------
 echo "生成订阅 token..."
-python3 - <<EOF
+python - <<EOF
 from app import get_token
 get_token()
 EOF
 
 # ---------------------------
-# 创建 systemd 服务
+# 创建或覆盖 systemd 服务文件
 # ---------------------------
-SERVICE_FILE="/etc/systemd/system/node_sub.service"
-
+echo "创建 systemd 服务文件..."
 sudo bash -c "cat > $SERVICE_FILE" <<EOL
 [Unit]
 Description=Node Subscription Manager
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
-WorkingDirectory=$(pwd)
-ExecStart=/usr/bin/python3 $(pwd)/app.py
+Type=simple
+WorkingDirectory=$APP_DIR
+ExecStart=$VENV_DIR/bin/python $APP_DIR/app.py
 Restart=always
+RestartSec=3
+User=root
 Environment=PYTHONUNBUFFERED=1
 
 [Install]
 WantedBy=multi-user.target
 EOL
 
-echo "启动服务并设置开机自启..."
+# ---------------------------
+# 重载 systemd & 启动服务
+# ---------------------------
+echo "重载 systemd 配置..."
 sudo systemctl daemon-reload
-sudo systemctl start node_sub
+
+echo "设置开机自启..."
 sudo systemctl enable node_sub
 
+echo "启动服务..."
+sudo systemctl restart node_sub
+
+echo "查看服务状态..."
+sleep 1
+sudo systemctl status node_sub --no-pager -n 20
+
 # ---------------------------
-# 显示 token
+# 显示订阅 token
 # ---------------------------
-TOKEN_FILE="access_token.txt"
+TOKEN_FILE="$APP_DIR/access_token.txt"
 if [ -f "$TOKEN_FILE" ]; then
     TOKEN=$(cat "$TOKEN_FILE")
     echo "部署完成！"
@@ -58,3 +98,6 @@ if [ -f "$TOKEN_FILE" ]; then
 else
     echo "⚠️ token 文件生成失败，请手动运行 app.py 生成 token"
 fi
+
+# 退出虚拟环境
+deactivate
