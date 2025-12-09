@@ -16,7 +16,7 @@ COPY . .
 # 初始化数据库（如果不存在）
 RUN python db_init.py || true
 
-# 暴露 Flask 默认端口
+# 暴露 Flask 端口
 EXPOSE 5786
 
 # 启动命令
