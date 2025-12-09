@@ -1,4 +1,5 @@
-# 节点订阅管理器
+节点订阅管理器
+==
 实现多个代理/节点集中起来，通过一个域名提供统一订阅，客户端更新订阅就能获取所有节点。
 
 支持一键部署，docker部署
@@ -77,7 +78,8 @@ reset_node_id.py节点删除之后序号不连贯，文件放到数据库一个�
 journalctl -u node_sub -f
 ```
 
-# docker compose部署 
+docker compose部署 
+==
 所有名称都是用的这个：node_sub_manager ，方便后面代码可以照抄，否则要改路径名称。
 ```bash
 services:
@@ -98,7 +100,7 @@ services:
       - FLASK_RUN_HOST=0.0.0.0
       - FLASK_RUN_PORT=5786
 ```
-## 安装后启动错误解决办法：
+## docker启动错误解决办法：
 确认宿主机文件类型
 ```bash
 ls -l /opt/stacks/node_sub_manager/access_token.txt
