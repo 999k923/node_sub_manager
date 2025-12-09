@@ -80,62 +80,30 @@ journalctl -u node_sub -f
 
 docker compose部署 
 ==
-所有名称都是用的这个：node_sub_manager ，方便后面代码可以照抄，否则要改路径名称。
+先创立好挂载的文件。
 ```bash
+mkdir -p /opt/stacks/node/data
+touch /opt/stacks/node/data/access_token.txt
+touch /opt/stacks/node/data/nodes.db
+```
+手动先写入token内容
+```bash
+echo "你的token内容" > /opt/stacks/node/data/access_token.txt
+```
+开始部署docker了
+```bash
+version: "3.9"
 services:
-  node_sub_manager:
-    image: 999k923/node_sub_manager:latest
-    container_name: node_sub_manager
+  node_name:
+    image: 999k923/node_name:latest
+    container_name: node_name
     restart: always
-
     ports:
-      - "5786:5786"
-
+      - 5786:5786
     volumes:
-      - ./nodes.db:/app/nodes.db
-      - ./access_token.txt:/app/access_token.txt
-      - ./logs:/app/logs
-
+      - /opt/stacks/node/data/nodes.db:/app/instance/nodes.db
+      - /opt/stacks/node/data/access_token.txt:/app/access_token.txt
     environment:
-      - FLASK_RUN_HOST=0.0.0.0
-      - FLASK_RUN_PORT=5786
+      - PYTHONUNBUFFERED=1
+networks: {}
 ```
-## docker启动错误解决办法：
-确认宿主机文件类型
-```bash
-ls -l /opt/stacks/node_sub_manager/access_token.txt
-file /opt/stacks/node_sub_manager/access_token.txt
-```
-
-如果显示是 directory → 先删除它：
-```bash
-rm -rf /opt/stacks/node_sub_manager/access_token.txt
-touch /opt/stacks/node_sub_manager/access_token.txt
-```
-
-可以正常启动登录管理后台了，页面出错乱码，vps的ssh主界面执行数据库初始化：
-```bash
-docker exec -it node_sub_manager /bin/bash
-```
-```bash
-python3 db_init.py
-```
-
-docker部署后获取不到订阅检查订阅tocken有没有正确生成，断开SSH重新连接返回vps的ssh主界面执行
-```bash
-docker exec -it node_sub_manager cat /app/access_token.txt
-```
-执行后获取不到token的数值，手动写入
-1. 删除旧 token 文件
-```bash
-rm -f /opt/stacks/node_sub_manager/access_token.txt
-```
-3. 写入新的 token，token可以在命令里面自行修改
-```bash
-echo "abc123xyz" > /opt/stacks/node_sub_manager/access_token.txt
-```
-5. 重启服务
-```bash
-docker restart node_sub_manager
-```
-
