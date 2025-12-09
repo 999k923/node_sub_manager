@@ -71,74 +71,9 @@ bash run.sh
 ## 工具信息
 id.py节点删除之后序号不连贯，文件放到数据库一个文件目录，运行序号从新生成。
 
-diaohuan.py放到数据库的同目录把两个序号的节点换个位置
-
-charu.py例如用于把序号10插入到序号3位置。
 
 ## 查看日志
 ```bash
 journalctl -u node_sub -f
 ```
 
-
-# docker compose部署 
-所有名称都是用的这个：node_sub_manager ，方便后面代码可以照抄，否则要改路径名称。
-```bash
-services:
-  node_sub_manager:
-    image: 999k923/node_sub_manager:latest
-    container_name: node_sub_manager
-    restart: always
-
-    ports:
-      - "5786:5786"
-
-    volumes:
-      - ./nodes.db:/app/nodes.db
-      - ./access_token.txt:/app/access_token.txt
-      - ./logs:/app/logs
-
-    environment:
-      - FLASK_RUN_HOST=0.0.0.0
-      - FLASK_RUN_PORT=5786
-```
-## 安装后启动错误解决办法：
-确认宿主机文件类型
-```bash
-ls -l /opt/stacks/node_sub_manager/access_token.txt
-file /opt/stacks/node_sub_manager/access_token.txt
-```
-
-如果显示是 directory → 先删除它：
-```bash
-rm -rf /opt/stacks/node_sub_manager/access_token.txt
-touch /opt/stacks/node_sub_manager/access_token.txt
-```
-
-可以正常启动登录管理后台了，页面出错乱码，vps的ssh主界面执行数据库初始化：
-```bash
-docker exec -it node_sub_manager /bin/bash
-```
-```bash
-python3 db_init.py
-```
-
-docker部署后获取不到订阅检查订阅tocken有没有正确生成，断开SSH重新连接返回vps的ssh主界面执行
-```bash
-docker exec -it node_sub_manager cat /app/access_token.txt
-```
-执行后获取不到token的数值，手动写入
-1. 删除旧 token 文件
-```bash
-rm -f /opt/stacks/node_sub_manager/access_token.txt
-```
-3. 写入新的 token，token可以在命令里面自行修改
-```bash
-echo "abc123xyz" > /opt/stacks/node_sub_manager/access_token.txt
-```
-5. 重启服务
-```bash
-docker restart node_sub_manager
-```
-
-还有其他问题问AI可以解决，或者用上面的一键部署不需要任何其他操作。
