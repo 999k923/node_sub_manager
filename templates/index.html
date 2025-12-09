@@ -7,25 +7,17 @@
         table {
             border-collapse: collapse;
             width: 100%;
-            table-layout: fixed; /* 固定列宽 */
         }
         th, td {
             border: 1px solid #ccc;
             padding: 4px;
             text-align: left;
-            word-wrap: break-word; /* 长文本换行 */
         }
         td.link-column {
-            max-width: 300px; /* 限制链接列最大宽度 */
-            overflow: hidden;
-            text-overflow: ellipsis; /* 超长显示省略号 */
-            white-space: nowrap; /* 不换行，显示省略号 */
-        }
-        td.name-column {
-            max-width: 150px;
+            max-width: 300px; /* 只固定链接列宽 */
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
+            white-space: nowrap; /* 不换行，超长显示省略号 */
         }
         ul {
             list-style-type: none;
@@ -69,7 +61,7 @@
                     {% for node in nodes if node.group_id == group.id %}
                         <li>
                             {{ node.sort_order }} - {{ node.name }} - 
-                            <span style="max-width: 300px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ node.link }}</span> - 
+                            <span style="max-width: 300px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ node.link }}">{{ node.link }}</span> - 
                             {{ '✅' if node.enabled else '❌' }}
                             <a href="{{ url_for('move_up', node_id=node.id) }}">↑</a>
                             <a href="{{ url_for('move_down', node_id=node.id) }}">↓</a>
@@ -91,7 +83,7 @@
     <table>
         <tr>
             <th>ID</th>
-            <th class="name-column">名称</th>
+            <th>名称</th>
             <th class="link-column">链接</th>
             <th>启用</th>
             <th>操作</th>
@@ -99,8 +91,8 @@
         {% for node in nodes if not node.group_id %}
         <tr>
             <td>{{ node.id }}</td>
-            <td class="name-column">{{ node.name }}</td>
-            <td class="link-column">{{ node.link }}</td>
+            <td>{{ node.name }}</td>
+            <td class="link-column" title="{{ node.link }}">{{ node.link }}</td>
             <td>{{ '✅' if node.enabled else '❌' }}</td>
             <td>
                 <a href="{{ url_for('move_up', node_id=node.id) }}">↑</a>
