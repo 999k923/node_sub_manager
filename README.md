@@ -71,7 +71,7 @@ systemctl restart node_sub
 ./run.sh
 ```
 ## 工具信息
-reset_node_id.py节点删除之后序号不连贯，文件放到数据库一个文件目录，运行序号从新生成。
+reset_node_id.py节点序号不连贯，运行序号从新生成。
 
 
 ## 查看日志
@@ -113,3 +113,5 @@ networks: {}
 
 访问后台：http://服务器IP:5786/
 节点地址：http://您的IP:5786/sub?token=“TOKEN”
+
+节点序号不连贯docker容器终端，cd instance，运行reset_node_id.py，重新生成序号
