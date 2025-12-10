@@ -127,17 +127,39 @@ def import_sub():
         lines = [line.strip() for line in content.splitlines() if line.strip()]
         # group_id 用 URL 标识
         max_order = db.session.query(func.max(Node.sort_order)).scalar() or 0
+
         for idx, link in enumerate(lines, start=1):
-            node = Node(
-                name=f"节点{idx}",
-                link=link,
-                group_id=sub_url,
-                sort_order=max_order+idx
-            )
-            db.session.add(node)
+            if link.startswith("vmess://"):
+                try:
+                    raw = link[8:]
+                    decoded = base64.b64decode(raw + "==").decode()
+                    j = json.loads(decoded)
+                    name = j.get("ps", f"节点{idx}")  # 获取备注名称（ps），如果没有则使用默认名称
+                    node = Node(
+                        name=name,
+                        link=link,
+                        group_id=sub_url,
+                        sort_order=max_order + idx
+                    )
+                    db.session.add(node)
+                except Exception as e:
+                    print(f"VMESS 更新失败 id={idx}：{e}")
+            
+            elif link.startswith("vless://"):
+                # 对于 vless 节点，提取 '#' 后面的备注部分作为节点名称
+                clean = re.sub(r"#.*$", "", link)
+                name = link.split("#")[-1] if "#" in link else f"节点{idx}"
+                node = Node(
+                    name=name,
+                    link=link,
+                    group_id=sub_url,
+                    sort_order=max_order + idx
+                )
+                db.session.add(node)
+        
         db.session.commit()
         flash(f"成功导入 {len(lines)} 个节点", "success")
-        reset_sort_order(sub_url)
+        reset_sort_order(sub_url)  # 更新排序
         try:
             update_nodes()
         except:
@@ -145,6 +167,7 @@ def import_sub():
     except Exception as e:
         flash(f"导入失败: {e}", "danger")
     return redirect(url_for("index"))
+
 
 # ---------------------------
 # 删除节点
