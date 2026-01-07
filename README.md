@@ -79,7 +79,7 @@ reset_node_id.py节点序号不连贯，运行序号从新生成。
 journalctl -u node_sub -f
 ```
 
-docker compose部署 
+docker 部署 
 ==
 先创立好挂载的文件。
 ```bash
@@ -91,7 +91,7 @@ touch /opt/stacks/node/data/nodes.db
 ```bash
 echo "你的token内容" > /opt/stacks/node/data/access_token.txt
 ```
-### 开始部署docker了
+### docker compose
 ```bash
 version: "3.9"
 services:
