@@ -120,8 +120,8 @@ docker run -d \
   -v /opt/stacks/node/data/nodes.db:/app/instance/nodes.db \
   -v /opt/stacks/node/data/access_token.txt:/app/access_token.txt \
   -e PYTHONUNBUFFERED=1 \
-  -e NODE_ADMIN_USER=xiaoanping \
-  -e NODE_ADMIN_PASS=xiao123456 \
+  -e NODE_ADMIN_USER=admin  \
+  -e NODE_ADMIN_PASS=abc123 \
   999k923/node_name:latest
 ```
 
