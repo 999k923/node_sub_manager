@@ -91,7 +91,7 @@ touch /opt/stacks/node/data/nodes.db
 ```bash
 echo "你的token内容" > /opt/stacks/node/data/access_token.txt
 ```
-开始部署docker了
+### 开始部署docker了
 ```bash
 version: "3.9"
 services:
@@ -109,6 +109,20 @@ services:
       - NODE_ADMIN_USER=admin #登录后台用户名自行更改
       - NODE_ADMIN_PASS=abc123 #密码自行更改
 networks: {}
+```
+
+### docker run
+```bash
+docker run -d \
+  --name node_name \
+  --restart always \
+  -p 5786:5786 \
+  -v /opt/stacks/node/data/nodes.db:/app/instance/nodes.db \
+  -v /opt/stacks/node/data/access_token.txt:/app/access_token.txt \
+  -e PYTHONUNBUFFERED=1 \
+  -e NODE_ADMIN_USER=xiaoanping \
+  -e NODE_ADMIN_PASS=xiao123456 \
+  999k923/node_name:latest
 ```
 
 访问后台：http://服务器IP:5786/
