@@ -18,12 +18,6 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY . .
 
 # ---------------------------
-# 给 run_cron.sh 和 reset_node_id.py 添加执行权限 （新增/改动）
-# ---------------------------
-RUN chmod +x /app/run_cron.sh
-RUN chmod +x /app/instance/reset_node_id.py
-
-# ---------------------------
 # 初始化数据库（如果不存在）
 # ---------------------------
 RUN python3 /app/db_init.py || true
@@ -34,6 +28,6 @@ RUN python3 /app/db_init.py || true
 EXPOSE 5786
 
 # ---------------------------
-# 启动：后台执行 run_cron.sh，每小时重置节点 ID；前台启动 Gunicorn
+# 启动：前台启动 Gunicorn
 # ---------------------------
-CMD /app/run_cron.sh & gunicorn -b 0.0.0.0:5786 app:app
+CMD gunicorn -b 0.0.0.0:5786 app:app
