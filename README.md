@@ -70,8 +70,6 @@ systemctl restart node_sub
 ```bash
 ./run.sh
 ```
-## 工具信息
-reset_node_id.py节点序号不连贯，运行序号从新生成。
 
 
 ## 查看日志
@@ -129,4 +127,3 @@ docker run -d \
 
 节点地址：http://您的IP:5786/sub?token=“TOKEN”
 
-docker版节点经过删除，移动顺序，序号不连贯了，不用管，1个小时之后会自动生成连贯的序号。
