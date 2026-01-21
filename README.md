@@ -30,14 +30,14 @@ git clone https://github.com/999k923/node_sub_manager.git && cd node_sub_manager
 订阅地址：`http://您的IP:5786/sub?token=“TOKEN”`
 
 ## 注意
-默认监听ipv4，如果需要监听ipv6端口需要把部署文件里面的监听改成监听ipv6后重启.
+默认监听ipv6，如果纯ipv4的机器没有监听ipv4，手动更改下。
 ```bash
 nano app.py
 ```
 最后一行里面的
-app.run(host="0.0.0.0", port=5786)改成 
+app.run(host="::", port=5786)改成 
 
-app.run(host="::", port=5786)后重启生效
+app.run(host="0.0.0.0", port=5786)后重启生效
 
 
 
